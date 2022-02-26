@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch
+import elasticsearch
 import requests
 import os
 
@@ -24,7 +25,9 @@ def fetch_api_key(name):
   data = response.json()
   return data["id"], data["api_key"]
 
-def connect_elasticsearch(api_id, api_key):
+def connect_elasticsearch(api_key_name):
+  api_id, api_key = fetch_api_key(api_key_name)  # fetch api key
+
   client = Elasticsearch(ES_HOST, api_key=(api_id, api_key), verify_certs=False)
 
   if client.ping():
@@ -32,3 +35,15 @@ def connect_elasticsearch(api_id, api_key):
   else:
     print(f"\nUnable to reach Elasticsearch cluster at {ES_HOST} using API key with id {api_id}")
   return client
+
+def create_index(es, index, mapping=None):
+  print(f"\nCreating index {index}...")
+  try:
+    es.indices.create(index=index, mappings=mapping)
+    print("\nIndex created successfully!")
+  except elasticsearch.exceptions.RequestError as ex:
+    if ex.error == 'resource_already_exists_exception':
+        print("\nIndex already exists, ignoring...")
+        pass
+    else: # other exception
+        raise ex
