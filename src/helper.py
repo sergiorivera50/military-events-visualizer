@@ -32,6 +32,3 @@ def connect_elasticsearch(api_id, api_key):
   else:
     print(f"\nUnable to reach Elasticsearch cluster at {ES_HOST} using API key with id {api_id}")
   return client
-
-api_id, api_key = fetch_api_key("python-inject-script")
-es = connect_elasticsearch(api_id, api_key)
