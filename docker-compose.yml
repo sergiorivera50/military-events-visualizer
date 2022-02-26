@@ -217,6 +217,20 @@ services:
       timeout: 10s
       retries: 120
 
+  python-inject-script:
+    depends_on:
+      es01:
+        condition: service_healthy
+    build: .
+    tty: true
+    environment: 
+      - "ES_HOST=https://es01:9200"
+      - "ES_USER=elastic"
+      - "ES_PASS=${ELASTIC_PASSWORD}"
+    volumes:
+      - .:/usr/src/app
+    
+
 volumes:
   certs:
     driver: local
